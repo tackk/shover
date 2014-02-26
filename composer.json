@@ -1,0 +1,21 @@
+{
+    "name": "tackk/pushit",
+    "description": "A lightweight PHP interface for the Pusher API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Horrigan",
+            "email": "dh@tackk.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "guzzle/guzzle": "~3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tackk\\Pushit\\": "src/"
+        },
+        "classmap": ["src/"]
+    }
+}
