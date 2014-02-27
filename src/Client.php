@@ -2,38 +2,63 @@
 namespace Tackk\Pushit;
 
 class Client {
+	/**
+	 * Holds the Pushit ConnectionInterface object.
+	 * @var ConnectionInterface
+	 */
 	protected $connection = null;
 
+	/**
+	 * @param ConnectionInterface $connection The Pusher Connection.
+	 */
 	public function __construct(ConnectionInterface $connection) {
 		$this->connection = $connection;
 	}
 
+	/**
+	 * Triggers an Event on the given Channel(s).
+	 *
+	 * @param  string|array $channels The Channel(s) to send on.
+	 * @param  string       $event    The even name.
+	 * @param  string|array $data     The data to send.
+	 * @param  int          $socketId Exclude this socket id from receiving the message.
+	 * @return bool
+	 * @throws GeneralException
+	 */
 	public function trigger($channels, $event, $data, $socketId = null) {
 		$channels = is_array($channels) ? $channels : [$channels];
 
-
+		if (count($channels) > 100) {
+			throw new GeneralException('You can only send to a maximum of 100 channels at a time.');
+		}
 
 		if ( ! is_string($data)) {
 			$data = json_encode($data);
 		}
 
-		$postParams = [
+		$body = [
 			'name' => $event,
 			'data' => $data,
-			'channels' => $channels
+			'channels' => $channels,
 		];
 		if ( ! is_null($socketId)) {
-			$postParams['socket_id'] = $socketId;
+			$body['socket_id'] = $socketId;
 		}
 
-		$postBody = json_encode($postParams);
+		$body = json_encode($body);
 
-		$this->connection->sendRequest('POST', '/events', [], $postBody);
+		$this->connection->dispatch(new Request('POST', '/events', [], $body));
 
 		return true;
 	}
 
-
+	/**
+	 * Gets information on a sepcific Channel.
+	 *
+	 * @param  string $channel The channel to get information about.
+	 * @param  string $info    Comma separated list of attributes which should be returned for the channel
+	 * @return array
+	 */
 	public function channel($channel, $info = null) {
 		$params = [];
 
@@ -41,9 +66,17 @@ class Client {
 			$params['info'] = $info;
 		}
 
-		return $this->connection->sendRequest('GET', "/channel/{$channel}", $params);
+		return $this->connection->dispatch(new Request('GET', "/channel/{$channel}", $params));
 	}
 
+
+	/**
+	 * Gets a list of occupied channels.
+	 *
+	 * @param  string $prefixFilter Filter the returned channels by a specific prefix
+	 * @param  string $info         A comma separated list of attributes which should be returned for each channel.
+	 * @return array
+	 */
 	public function channels($prefixFilter = null, $info = null) {
 		$params = [];
 		if ( ! empty($prefixFilter)) {
@@ -53,11 +86,6 @@ class Client {
 			$params['info'] = $info;
 		}
 
-		$response = $this->connection->sendRequest('GET', '/channels', $params);
-		if (isset($response['channels'])) {
-			return $response['channels'];
-		}
-
-		return [];
+		return $this->connection->dispatch(new Request('GET', '/channels', $params));
 	}
 }
