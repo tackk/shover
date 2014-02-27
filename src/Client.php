@@ -69,7 +69,6 @@ class Client {
 		return $this->connection->dispatch(new Request('GET', "/channel/{$channel}", $params));
 	}
 
-
 	/**
 	 * Gets a list of occupied channels.
 	 *
@@ -88,4 +87,18 @@ class Client {
 
 		return $this->connection->dispatch(new Request('GET', '/channels', $params));
 	}
+
+	/**
+	 * Gets the user ids currently subscribed to a given presence channel.
+	 *
+	 * @param  string $channel The channel to get information about.
+	 * @return array
+	 */
+	public function users($channel) {
+		if (strpos($channel, 'presence-') !== 0) {
+			throw new GeneralException('You can only get the users of a Presence channel.');
+		}
+		return $this->connection->dispatch(new Request('GET', "/channel/{$channel}/users"));
+	}
+
 }
