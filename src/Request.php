@@ -1,6 +1,8 @@
 <?php
 namespace Tackk\Pushit;
 
+use RuntimeException;
+
 class Request {
 	/**
 	 * The HTTP Method
