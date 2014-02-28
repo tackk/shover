@@ -30,8 +30,7 @@ class Curl extends AbstractTransport {
 	 * @return array The Response array
 	 */
 	public function dispatch(Request $request) {
-		$request->setCredentials($this->credentials)
-				->prepare();
+		$this->marshal($request);
 
 		$this->setupCurl($request);
 		$response = curl_exec($this->handle);
@@ -41,18 +40,21 @@ class Curl extends AbstractTransport {
 				return json_decode($response, true);
 			case 401:
 				throw new AuthenticationException($response);
-				break;
 			case 403:
 				throw new ForbiddenException('Forbidden: app disabled or over message quota');
-				break;
 			default:
 				throw new GeneralException($response);
 		}
 	}
 
+	/**
+	 * Setup the Curl Options.
+	 * 
+	 * @param  Request $request The Request
+	 */
 	protected function setupCurl(Request $request) {
 		curl_setopt_array($this->handle, [
-			CURLOPT_URL            => $this->apiUrl($request->getUri().'?'.$request->getQuery(true)),
+			CURLOPT_URL            => $this->fullUrl($request->getUri().'?'.$request->getQuery(true)),
 			CURLOPT_TIMEOUT        => $this->options['timeout'],
 			CURLOPT_CONNECTTIMEOUT => $this->options['connect_timeout'],
 			CURLOPT_RETURNTRANSFER => true,

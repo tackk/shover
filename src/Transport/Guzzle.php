@@ -38,10 +38,8 @@ class Guzzle extends AbstractTransport {
 	 * @return array The Response array
 	 */
 	public function dispatch(Request $request) {
-		$request->setCredentials($this->credentials)
-		        ->prepare();
-
 		try {
+			$this->marshal($request);
 			$method = $request->getMethod();
 			$guzzleRequest = $this->guzzle->{$method}($request->getUri());
 			$guzzleRequest->getQuery()->merge($request->getQuery());

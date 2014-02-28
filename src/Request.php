@@ -29,16 +29,10 @@ class Request {
 	protected $body = null;
 
 	/**
-	 * THe Credentials Object
-	 * @var Credentials
-	 */
-	protected $credentials = null;
-
-	/**
 	 * Whether the request has been prepared or not.
 	 * @var bool
 	 */
-	protected $prepared = false;
+	protected $signed = false;
 
 	/**
 	 * @param string $method The HTTP Method
@@ -51,16 +45,6 @@ class Request {
 		$this->setUri($uri);
 		$this->setQuery($query);
 		$this->setBody($body);
-	}
-
-	/**
-	 * Set's the Credentials.
-	 * 
-	 * @param Credentials $credentials The Credentials
-	 */
-	public function setCredentials($credentials) {
-		$this->credentials = $credentials;
-		return $this;
 	}
 
 	/**
@@ -107,7 +91,6 @@ class Request {
 	 * @return array
 	 */
 	public function getQuery($asString = false) {
-		$this->prepare();
 		return $asString ? http_build_query($this->query) : $this->query;
 	}
 	
@@ -117,9 +100,38 @@ class Request {
 	 * @param array $query The Query
 	 */
 	public function setQuery($query) {
-		$this->prepared = false;
+		$this->signed = false;
 		$this->query = $query;
 		return $this;
+	}
+
+	/**
+	 * Merge in the given Query Parameters.
+	 *
+	 * @param  array $query The Query Parameters to merge in.
+	 */
+	public function mergeQuery($query) {
+		$this->signed = false;
+		$this->query = array_merge($this->query, $query);
+		return $this;
+	}
+
+	/**
+	 * Returns if this request has been signed.
+	 *
+	 * @return boolean
+	 */
+	public function isSigned() {
+		return $this->signed;
+	}
+
+	/**
+	 * Sets if this Request is signed.
+	 * 
+	 * @param bool $signed Whether it is signed.
+	 */
+	public function setSigned($signed) {
+		$this->signed = $signed;
 	}
 
 	/**
@@ -141,56 +153,4 @@ class Request {
 	    return $this;
 	}
 
-	/**
-	 * Prepares the Request so it can be dispatched.
-	 *
-	 * @return Request
-	 */
-	public function prepare() {
-		if ($this->prepared) {
-			return $this;
-		}
-
-		if ( ! $this->credentials instanceof Credentials) {
-			throw new RuntimeException('You must set the Credentials for the Request.');
-		}
-		$this->prepareUri();
-
-		$this->query['auth_key'] = $this->credentials->getAuthKey();
-		$this->query['auth_timestamp'] = time();
-		$this->query['auth_version'] = '1.0';
-
-		if ( ! is_null($this->body)) {
-			$this->query['body_md5'] = md5($this->body);
-		}
-
-		$this->sign();
-
-		$this->prepared = true;
-		return $this;
-	}
-
-	/**
-	 * Signs the Request for Pusher.
-	 *
-	 * @see    http://pusher.com/docs/rest_api#authentication
-	 * @return Request
-	 */
-	protected function sign() {
-		ksort($this->query);
-		$queryString = urldecode(http_build_query(array_change_key_case($this->query, CASE_LOWER)));
-		$stringToSign = $this->method."\n".$this->uri."\n".$queryString;
-		$this->query['auth_signature'] = hash_hmac('sha256', $stringToSign, $this->credentials->getAuthSecret());
-		return $this;
-	}
-
-	/**
-	 * Perpare the URI.
-	 *
-	 * @return Request
-	 */
-	protected function prepareUri() {
-		$this->uri = '/apps/'.$this->credentials->getAppId().'/'.ltrim($this->uri, '/');
-		return $this;
-	}
 }
