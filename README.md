@@ -2,6 +2,12 @@
 
 A lightweight PHP interface for the [Pusher API](http://pusher.com/docs/rest_api).
 
+## Installation
+
+### Composer
+
+	"tackk/shover": "1.0.*"
+
 ## Transports
 
 All transports must extend the `Tackk\Shover\Transport\AbstractTransport`.
