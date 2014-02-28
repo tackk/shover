@@ -1,5 +1,5 @@
 <?php
-namespace Tackk\Pushit;
+namespace Tackk\Shover;
 
 interface ConnectionInterface {
 	public function dispatch(Request $request);

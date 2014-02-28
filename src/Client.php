@@ -1,9 +1,9 @@
 <?php
-namespace Tackk\Pushit;
+namespace Tackk\Shover;
 
 class Client {
 	/**
-	 * Holds the Pushit ConnectionInterface object.
+	 * Holds the Shover ConnectionInterface object.
 	 * @var ConnectionInterface
 	 */
 	protected $connection = null;

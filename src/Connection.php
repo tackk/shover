@@ -1,5 +1,5 @@
 <?php
-namespace Tackk\Pushit;
+namespace Tackk\Shover;
 
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
@@ -48,7 +48,7 @@ class Connection implements ConnectionInterface {
 
 	/**
 	 * Dispaches a Request.
-	 * 
+	 *
 	 * @param  Request $request The Request
 	 * @return array The Response array
 	 */

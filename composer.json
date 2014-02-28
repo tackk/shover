@@ -1,5 +1,5 @@
 {
-    "name": "tackk/pushit",
+    "name": "tackk/shover",
     "description": "A lightweight PHP interface for the Pusher API",
     "license": "MIT",
     "authors": [
@@ -8,14 +8,20 @@
             "email": "dh@tackk.com"
         }
     ],
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
     "require": {
         "php": ">=5.4.0",
         "guzzle/guzzle": "~3.7"
     },
     "autoload": {
         "psr-4": {
-            "Tackk\\Pushit\\": "src/"
+            "Tackk\\Shover\\": "src/"
         },
         "classmap": ["src/"]
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }

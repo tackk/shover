@@ -1,5 +1,5 @@
 <?php
-namespace Tackk\Pushit;
+namespace Tackk\Shover;
 
 class Credentials {
 	/**

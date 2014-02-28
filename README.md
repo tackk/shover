@@ -1,14 +1,14 @@
-# Pushit
+# Shover
 
-A simple PHP interface for the [Pusher API](http://pusher.com/docs/rest_api).
+A lightweight PHP interface for the [Pusher API](http://pusher.com/docs/rest_api).
 
 ## Example
 
 ``` php
 <?php
-use Tackk\Pushit\Credentials;
-use Tackk\Pushit\Connection;
-use Tackk\Pushit\Client;
+use Tackk\Shover\Credentials;
+use Tackk\Shover\Connection;
+use Tackk\Shover\Client;
 
 require 'vendor/autoload.php';
 
