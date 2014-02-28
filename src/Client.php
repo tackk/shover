@@ -1,18 +1,20 @@
 <?php
 namespace Tackk\Shover;
 
+use Tackk\Shover\Transport\AbstractTransport;
+
 class Client {
 	/**
-	 * Holds the Shover ConnectionInterface object.
-	 * @var ConnectionInterface
+	 * Holds the Shover AbstractTransport object.
+	 * @var TransportInterface
 	 */
-	protected $connection = null;
+	protected $transport = null;
 
 	/**
-	 * @param ConnectionInterface $connection The Pusher Connection.
+	 * @param AbstractTransport $transport The Pusher Transport.
 	 */
-	public function __construct(ConnectionInterface $connection) {
-		$this->connection = $connection;
+	public function __construct(AbstractTransport $transport) {
+		$this->transport = $transport;
 	}
 
 	/**
@@ -47,7 +49,7 @@ class Client {
 
 		$body = json_encode($body);
 
-		$this->connection->dispatch(new Request('POST', '/events', [], $body));
+		$this->transport->dispatch(new Request('POST', '/events', [], $body));
 
 		return true;
 	}
@@ -66,7 +68,7 @@ class Client {
 			$params['info'] = $info;
 		}
 
-		return $this->connection->dispatch(new Request('GET', "/channel/{$channel}", $params));
+		return $this->transport->dispatch(new Request('GET', "/channel/{$channel}", $params));
 	}
 
 	/**
@@ -85,7 +87,7 @@ class Client {
 			$params['info'] = $info;
 		}
 
-		return $this->connection->dispatch(new Request('GET', '/channels', $params));
+		return $this->transport->dispatch(new Request('GET', '/channels', $params));
 	}
 
 	/**
@@ -98,7 +100,7 @@ class Client {
 		if (strpos($channel, 'presence-') !== 0) {
 			throw new GeneralException('You can only get the users of a Presence channel.');
 		}
-		return $this->connection->dispatch(new Request('GET', "/channel/{$channel}/users"));
+		return $this->transport->dispatch(new Request('GET', "/channel/{$channel}/users"));
 	}
 
 }

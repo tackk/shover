@@ -35,6 +35,12 @@ class Request {
 	protected $credentials = null;
 
 	/**
+	 * Whether the request has been prepared or not.
+	 * @var bool
+	 */
+	protected $prepared = false;
+
+	/**
 	 * @param string $method The HTTP Method
 	 * @param string $uri    The URI Path
 	 * @param array  $query  The Query to send.
@@ -100,8 +106,9 @@ class Request {
 	 *
 	 * @return array
 	 */
-	public function getQuery() {
-		return $this->query;
+	public function getQuery($asString = false) {
+		$this->prepare();
+		return $asString ? http_build_query($this->query) : $this->query;
 	}
 	
 	/**
@@ -110,6 +117,7 @@ class Request {
 	 * @param array $query The Query
 	 */
 	public function setQuery($query) {
+		$this->prepared = false;
 		$this->query = $query;
 		return $this;
 	}
@@ -139,6 +147,10 @@ class Request {
 	 * @return Request
 	 */
 	public function prepare() {
+		if ($this->prepared) {
+			return $this;
+		}
+
 		if ( ! $this->credentials instanceof Credentials) {
 			throw new RuntimeException('You must set the Credentials for the Request.');
 		}
@@ -154,6 +166,7 @@ class Request {
 
 		$this->sign();
 
+		$this->prepared = true;
 		return $this;
 	}
 

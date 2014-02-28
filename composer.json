@@ -13,7 +13,10 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "guzzle/guzzle": "~3.7"
+        "ext-curl": "*"
+    },
+    "suggest": {
+        "guzzle/guzzle": "If you are making a lot of requests, use Guzzle."
     },
     "autoload": {
         "psr-4": {
