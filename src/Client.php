@@ -144,6 +144,6 @@ class Client
             $userData['user_info'] = $userInfo;
         }
 
-        return $this->socketAuth($channel, $socketId, json_encode($userData));
+        return $this->socketSignature($channel, $socketId, json_encode($userData));
     }
 }
