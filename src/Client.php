@@ -104,6 +104,7 @@ class Client
      *
      * @param  string $channel The channel to get information about.
      * @return array
+     * @throws GeneralException
      */
     public function users($channel)
     {
