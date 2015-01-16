@@ -115,4 +115,35 @@ class Client
         return $this->transport->dispatch(new Request('GET', "/channel/{$channel}/users"));
     }
 
+    /**
+     * Creates a socket signature.
+     *
+     * @param string $channel
+     * @param string $socketId
+     * @param array|bool  $customData
+     * @return string
+     */
+    public function socketSignature($channel, $socketId, $customData = false)
+    {
+        return json_encode($this->transport->getSocketSignature($channel, $socketId, $customData));
+    }
+
+    /**
+     * Creates a presence socket signature.
+     *
+     * @param string $channel
+     * @param string $socketId
+     * @param int    $userId
+     * @param array|bool  $userInfo
+     * @return string
+     */
+    public function presenceSignature($channel, $socketId, $userId, $userInfo = false)
+    {
+        $userData = ['user_id' => $userId];
+        if ($userInfo !== false) {
+            $userData['user_info'] = $userInfo;
+        }
+
+        return $this->socketAuth($channel, $socketId, json_encode($userData));
+    }
 }

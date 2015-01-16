@@ -41,6 +41,7 @@ abstract class AbstractTransport
      * Signs the Request so it can be dispatched.
      *
      * @param  Request $request The Request to Sign
+     * @return $this
      */
     public function signRequest(Request $request)
     {
@@ -48,7 +49,8 @@ abstract class AbstractTransport
             return $this;
         }
 
-        $query                   = $request->getQuery();
+        $query = $request->getQuery();
+
         $query['auth_key']       = $this->credentials->getAuthKey();
         $query['auth_timestamp'] = time();
         $query['auth_version']   = '1.0';
@@ -58,14 +60,35 @@ abstract class AbstractTransport
         }
 
         ksort($query);
-        $queryString             = urldecode(http_build_query(array_change_key_case($query, CASE_LOWER)));
-        $stringToSign            = $request->getMethod()."\n".$request->getUri()."\n".$queryString;
+        $queryString  = urldecode(http_build_query(array_change_key_case($query, CASE_LOWER)));
+        $stringToSign = $request->getMethod()."\n".$request->getUri()."\n".$queryString;
+
         $query['auth_signature'] = hash_hmac('sha256', $stringToSign, $this->credentials->getAuthSecret());
 
         $request->setQuery($query);
         $request->setSigned(true);
 
         return $this;
+    }
+
+    public function getSocketSignature($channel, $socketId, $customData = false)
+    {
+        if ($customData !== false) {
+            $signature = hash_hmac('sha256', $socketId.':'.$channel.':'.$customData, $this->credentials->getAuthSecret(), false);
+        } else {
+            $signature = hash_hmac('sha256', $socketId.':'.$channel, $this->credentials->getAuthSecret(), false);
+        }
+
+        $signature = [
+            'auth' => $this->credentials->getAuthKey().':'.$signature
+        ];
+
+        // add the custom data if it has been supplied
+        if ($customData) {
+            $signature['channel_data'] = $customData;
+        }
+
+        return $signature;
     }
 
     /**
