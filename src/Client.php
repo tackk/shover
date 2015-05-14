@@ -34,9 +34,8 @@ class Client
     {
         $channels = is_array($channels) ? $channels : [$channels];
 
-        if (count($channels) > 100) {
-            throw new GeneralException('You can only send to a maximum of 100 channels at a time.');
-        }
+        $this->validateSocketId($socketId);
+        $this->validateChannels($channels);
 
         if (! is_string($data)) {
             $data = json_encode($data);
@@ -68,8 +67,9 @@ class Client
      */
     public function channel($channel, $info = null)
     {
-        $params = [];
+        $this->validateChannel($channel);
 
+        $params = [];
         if (! empty($info)) {
             $params['info'] = $info;
         }
@@ -108,6 +108,8 @@ class Client
      */
     public function users($channel)
     {
+        $this->validateChannel($channel);
+
         if (strpos($channel, 'presence-') !== 0) {
             throw new GeneralException('You can only get the users of a Presence channel.');
         }
@@ -125,6 +127,9 @@ class Client
      */
     public function socketSignature($channel, $socketId, $customData = false)
     {
+        $this->validateSocketId($socketId);
+        $this->validateChannel($channel);
+
         return json_encode($this->transport->getSocketSignature($channel, $socketId, $customData));
     }
 
@@ -145,5 +150,43 @@ class Client
         }
 
         return $this->socketSignature($channel, $socketId, json_encode($userData));
+    }
+
+    /**
+     * Validates the given Socket ID.
+     * @param $socketId
+     * @throws GeneralException
+     */
+    private function validateSocketId($socketId)
+    {
+        if ($socketId !== null && ! preg_match('/\A\d+\.\d+\z/', $socketId)) {
+            throw new GeneralException('Invalid SocketId: '.$socketId);
+        }
+    }
+
+    /**
+     * Validate a channel name.
+     * @param $channel
+     * @throws GeneralException
+     */
+    private function validateChannel($channel)
+    {
+        if ( ! preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $channel)) {
+            throw new GeneralException('Invalid Channel Name: '.$channel);
+        }
+    }
+
+    /**
+     * Validates an array of channel names.
+     * @param array $channels
+     * @throws GeneralException
+     */
+    private function validateChannels(array $channels)
+    {
+        if (count($channels) > 100) {
+            throw new GeneralException('You can only send to a maximum of 100 channels at a time.');
+        }
+
+        array_walk($channels, [$this, 'validateChannel']);
     }
 }

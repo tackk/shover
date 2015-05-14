@@ -38,6 +38,9 @@ class Guzzle extends AbstractTransport
      *
      * @param  Request $request The Request
      * @return array The Response array
+     * @throws AuthenticationException
+     * @throws ForbiddenException
+     * @throws GeneralException
      */
     public function dispatch(Request $request)
     {
