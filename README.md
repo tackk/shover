@@ -6,7 +6,7 @@ A lightweight PHP interface for the [Pusher API](http://pusher.com/docs/rest_api
 
 ### Composer
 
-	"tackk/shover": "1.0.*"
+    "tackk/shover": "1.1.*"
 
 ## Transports
 
